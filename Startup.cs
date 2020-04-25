@@ -8,6 +8,7 @@ namespace DemoAPI
 {
     public class Startup
     {
+        readonly string allowedOrigins = "_allowedOrigins";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -18,6 +19,15 @@ namespace DemoAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: allowedOrigins,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins("http://localhost:3000",
+                                                          "http://jycl1234-demoapi-fe.s3-website.us-east-2.amazonaws.com");
+                                  });
+            });
             services.AddControllers();
         }
 
@@ -30,6 +40,8 @@ namespace DemoAPI
             }
 
             app.UseRouting();
+
+            app.UseCors(allowedOrigins);
 
             app.UseAuthorization();
 
