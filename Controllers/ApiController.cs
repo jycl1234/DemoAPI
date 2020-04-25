@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
 
 namespace DemoAPI.Controllers
 {
@@ -64,16 +64,18 @@ namespace DemoAPI.Controllers
 
         [HttpGet]
         [Route("[controller]")]
-        public List<Item> Get()
+        public ContentResult Get()
         {
             List<Item> items = FetchData();
             try
             {
-                return items;
+                var response = new { success = true, response = items };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
             catch
             {
-                return null;
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
 
@@ -81,16 +83,18 @@ namespace DemoAPI.Controllers
 
         [HttpGet("{id}")]
         [Route("[controller]/getitem/{id}")]
-        public Item GetItem(int id)
+        public ContentResult GetItem(int id)
         {
             List<Item> items = FetchData();
             try
             {
-                return items.Where(x => x.Id == id).FirstOrDefault();
+                var response = new { success = true, response = items.Where(x => x.Id == id).FirstOrDefault() };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
             catch
             {
-                return null;
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
 
@@ -98,7 +102,7 @@ namespace DemoAPI.Controllers
 
         [HttpGet("{itemname}")]
         [Route("[controller]/getmaxprices")]
-        public List<Item> GetMaxPrices()
+        public ContentResult GetMaxPrices()
         {
             List<Item> items = FetchData();
             try
@@ -110,11 +114,13 @@ namespace DemoAPI.Controllers
                 {
                     itemMaxPrices.Add(sortedList.Where(x => x.ItemName == key).FirstOrDefault());
                 }
-                return itemMaxPrices;
+                var response = new { success = true, response = itemMaxPrices };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
             catch
             {
-                return null;
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
 
@@ -122,17 +128,19 @@ namespace DemoAPI.Controllers
 
         [HttpGet("{itemname}")]
         [Route("[controller]/getmaxprice/{itemname}")]
-        public long GetMaxPrice(string itemname)
+        public ContentResult GetMaxPrice(string itemname)
         {
             List<Item> items = FetchData();
             try
             {
                 List<Item> itemsWithName = items.FindAll(x => x.ItemName == itemname);
-                return itemsWithName.OrderByDescending(x => x.Cost).ElementAt(0).Cost;
+                var response = new { success = true, response = itemsWithName.OrderByDescending(x => x.Cost).ElementAt(0).Cost.ToString() };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
             catch
             {
-                return 0;
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
 
