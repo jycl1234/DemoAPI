@@ -152,6 +152,41 @@ namespace DemoAPI.Controllers
             }
         }
 
+        // update with existing key
+
+        [HttpPost]
+        [Route("[controller]/update")]
+        public ContentResult UpdateItem([FromBody] Item item)
+        {
+            if (item.Id <= 0 || item.ItemName == null || item.Cost < 0)
+            {
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            MySqlConnection conn = new MySqlConnection(Constants.connString);
+            try
+            {                
+                string query = "UPDATE items SET ITEM_NAME = @name, COST = @cost WHERE ID = @id;";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.Add("@name", MySqlDbType.VarChar, 45).Value = item.ItemName;
+                cmd.Parameters.Add("@cost", MySqlDbType.Float).Value = item.Cost;
+                cmd.Parameters.Add("@id", MySqlDbType.Int64).Value = item.Id;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                var response = new { success = true, response = item };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            catch (Exception e)
+            {
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            finally
+            {
+                conn.Dispose();
+            }
+        }
+
         //// POST: API/Create
         //[HttpPost]
         //[ValidateAntiForgeryToken]

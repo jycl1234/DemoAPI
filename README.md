@@ -12,4 +12,6 @@ The base URL is at `/api`. This will show a list of all records.
 
 `/api/getmaxprice/{itemname}`: This returns the max price of an item by `itemname`, which should be a string identical to an item name in the table.
 
+`/api/update`: This updates an existing item. The payload must be in JSON format, with Id (number), ItemName (string), and Cost (number).
+
 All endpoints return `success: true` on successful query, and `success: false` on not found or errors.
