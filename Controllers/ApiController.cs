@@ -88,8 +88,16 @@ namespace DemoAPI.Controllers
             List<Item> items = FetchData();
             try
             {
-                var response = new { success = true, response = items.Where(x => x.Id == id).FirstOrDefault() };
-                return Content(JsonConvert.SerializeObject(response), "application/json");
+                Item item = items.Where(x => x.Id == id).FirstOrDefault();
+                if (item != null)
+                {
+                    var response = new { success = true, response = item };
+                    return Content(JsonConvert.SerializeObject(response), "application/json");
+                } else
+                {
+                    var response = new { success = false };
+                    return Content(JsonConvert.SerializeObject(response), "application/json");
+                }
             }
             catch
             {
