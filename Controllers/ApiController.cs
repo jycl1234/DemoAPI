@@ -72,9 +72,9 @@ namespace DemoAPI.Controllers
                 var response = new { success = true, response = items };
                 return Content(JsonConvert.SerializeObject(response), "application/json");
             }
-            catch
+            catch (Exception e)
             {
-                var response = new { success = false };
+                var response = new { success = false, response = e.Message.ToString() };
                 return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
@@ -99,9 +99,9 @@ namespace DemoAPI.Controllers
                     return Content(JsonConvert.SerializeObject(response), "application/json");
                 }
             }
-            catch
+            catch (Exception e)
             {
-                var response = new { success = false };
+                var response = new { success = false, response = e.Message.ToString() };
                 return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
@@ -145,14 +145,77 @@ namespace DemoAPI.Controllers
                 var response = new { success = true, response = itemsWithName.OrderByDescending(x => x.Cost).ElementAt(0).Cost.ToString() };
                 return Content(JsonConvert.SerializeObject(response), "application/json");
             }
-            catch
+            catch (Exception e)
             {
-                var response = new { success = false };
+                var response = new { success = false, response = e.Message.ToString() };
                 return Content(JsonConvert.SerializeObject(response), "application/json");
             }
         }
 
+        // add new item
+
+        [HttpPost]
+        [Route("[controller]/add")]
+        public ContentResult AddItem([FromBody] Item item)
+        {
+            if (item.ItemName == null || item.Cost < 0)
+            {
+                var response = new { success = false };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            MySqlConnection conn = new MySqlConnection(Constants.connString);
+            try
+            {
+                string query = "INSERT INTO demoapi.items (ITEM_NAME, COST) VALUES(@name, @cost);";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.Add("@name", MySqlDbType.VarChar, 45).Value = item.ItemName;
+                cmd.Parameters.Add("@cost", MySqlDbType.Float).Value = item.Cost;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                var response = new { success = true, response = item };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            catch (Exception e)
+            {
+                var response = new { success = false, response = e.Message.ToString() };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            finally
+            {
+                conn.Dispose();
+            }
+        }
+
+        // delete item
+
+        [HttpPost]
+        [Route("[controller]/delete/{id}")]
+        public ContentResult DeleteItem(int id)
+        {
+            MySqlConnection conn = new MySqlConnection(Constants.connString);
+            try
+            {
+                string query = "DELETE FROM demoapi.items WHERE ID = @id;";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.Add("@id", MySqlDbType.Float).Value = id;
+                conn.Open();
+                cmd.ExecuteNonQuery();
+                var response = new { success = true, response = id };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            catch (Exception e)
+            {
+                var response = new { success = false, response = e.Message.ToString() };
+                return Content(JsonConvert.SerializeObject(response), "application/json");
+            }
+            finally
+            {
+                conn.Dispose();
+            }
+        }
+
         // update with existing key
+        // ideally this should be PUT not POST; not sure i have enough time to amend this
 
         [HttpPost]
         [Route("[controller]/update")]
@@ -178,7 +241,7 @@ namespace DemoAPI.Controllers
             }
             catch (Exception e)
             {
-                var response = new { success = false };
+                var response = new { success = false, response = e.Message.ToString() };
                 return Content(JsonConvert.SerializeObject(response), "application/json");
             }
             finally
@@ -187,67 +250,5 @@ namespace DemoAPI.Controllers
             }
         }
 
-        //// POST: API/Create
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create(IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add insert logic here
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: API/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: API/Edit/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add update logic here
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: API/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: API/Delete/5
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Delete(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add delete logic here
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
     }
 }

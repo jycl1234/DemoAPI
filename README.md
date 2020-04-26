@@ -12,6 +12,10 @@ The base URL is at `/api`. This will show a list of all records.
 
 `/api/getmaxprice/{itemname}`: This returns the max price of an item by `itemname`, which should be a string identical to an item name in the table.
 
+`/api/add`: This adds a new item. The payload must be in JSON format, with ItemName (string) and Cost (number).
+
 `/api/update`: This updates an existing item. The payload must be in JSON format, with Id (number), ItemName (string), and Cost (number).
 
-All endpoints return `success: true` on successful query, and `success: false` on not found or errors.
+`/api/delete/{id}`: This deletes an existing item with integer `id`. Due to lack of cross checking, deleting a nonexistent item will return successfully.
+
+All endpoints return `success: true` on successful query, and `success: false` on not found or errors. Exception details can be found in the console log.
