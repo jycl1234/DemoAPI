@@ -9,4 +9,9 @@ namespace DemoAPI
         public long Cost { get; set; }
     }
 
+    public class ItemToBeAdded
+    {
+        public string ItemName { get; set; }
+        public long Cost { get; set; }
+    }
 }

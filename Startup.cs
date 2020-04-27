@@ -19,13 +19,15 @@ namespace DemoAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddCors(options =>
             {
                 options.AddPolicy(name: allowedOrigins,
                                   builder =>
                                   {
                                       builder.WithOrigins("http://localhost:3000",
-                                                          "http://jycl1234-demoapi-fe.s3-website.us-east-2.amazonaws.com");
+                                                          "http://jycl1234-demoapi-fe.s3-website.us-east-2.amazonaws.com")
+                                      .WithHeaders("Accept", "Content-Type", "Origin", "X-My-Header");
                                   });
             });
             services.AddControllers();

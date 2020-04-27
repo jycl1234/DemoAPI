@@ -156,7 +156,7 @@ namespace DemoAPI.Controllers
 
         [HttpPost]
         [Route("[controller]/add")]
-        public ContentResult AddItem([FromBody] Item item)
+        public ContentResult AddItem([FromBody] ItemToBeAdded item)
         {
             if (item.ItemName == null || item.Cost < 0)
             {
